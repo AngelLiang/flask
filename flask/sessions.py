@@ -7,6 +7,10 @@
 
     :copyright: © 2010 by the Pallets team.
     :license: BSD, see LICENSE for more details.
+
+笔记：
+    在 itsdangerous 基础上实现的 sessions 的 cookie
+    Flask的 session 本质上就是 cookie 
 """
 
 import hashlib
@@ -22,7 +26,10 @@ from flask.json.tag import TaggedJSONSerializer
 
 
 class SessionMixin(MutableMapping):
-    """Expands a basic dictionary with session attributes."""
+    """Expands a basic dictionary with session attributes.
+    
+    Session 混合类
+    """
 
     @property
     def permanent(self):
@@ -69,6 +76,7 @@ class SecureCookieSession(CallbackDict, SessionMixin):
     # :class:`.SecureCookieSessionInterface` to add a ``Vary: Cookie``
     #: header, which allows caching proxies to cache different pages for
     #: different users.
+    # 当数据可读可写，这个设置为True
     accessed = False
 
     def __init__(self, initial=None):
@@ -235,7 +243,7 @@ class SessionInterface(object):
         uses ``/`` if it's ``None``.
         """
         return app.config['SESSION_COOKIE_PATH'] \
-               or app.config['APPLICATION_ROOT']
+            or app.config['APPLICATION_ROOT']
 
     def get_cookie_httponly(self, app):
         """Returns True if the session cookie should be httponly.  This
@@ -318,7 +326,7 @@ class SecureCookieSessionInterface(SessionInterface):
     #: JSON derived serializer with support for some extra Python types
     #: such as datetime objects or tuples.
     serializer = session_json_serializer
-    session_class = SecureCookieSession
+    session_class = SecureCookieSession     # session类
 
     def get_signing_serializer(self, app):
         if not app.secret_key:
@@ -327,6 +335,7 @@ class SecureCookieSessionInterface(SessionInterface):
             key_derivation=self.key_derivation,
             digest_method=self.digest_method
         )
+        # URL安全序列化
         return URLSafeTimedSerializer(app.secret_key, salt=self.salt,
                                       serializer=self.serializer,
                                       signer_kwargs=signer_kwargs)
@@ -373,6 +382,7 @@ class SecureCookieSessionInterface(SessionInterface):
         samesite = self.get_cookie_samesite(app)
         expires = self.get_expiration_time(app, session)
         val = self.get_signing_serializer(app).dumps(dict(session))
+        # 设置 cookie
         response.set_cookie(
             app.session_cookie_name,
             val,

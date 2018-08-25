@@ -7,6 +7,16 @@
 
     :copyright: © 2010 by the Pallets team.
     :license: BSD, see LICENSE for more details.
+
+笔记：
+    - def after_this_request()
+    - def copy_current_request_context()
+    - def has_request_context()
+    - def has_app_context()
+
+    - class _AppCtxGlobals(object)
+    - class AppContext(object)
+    - class RequestContext(object)
 """
 
 import sys
@@ -14,6 +24,7 @@ from functools import update_wrapper
 
 from werkzeug.exceptions import HTTPException
 
+# 请求上下文栈和应用上下文栈
 from .globals import _request_ctx_stack, _app_ctx_stack
 from .signals import appcontext_pushed, appcontext_popped
 from ._compat import BROKEN_PYPY_CTXMGR_EXIT, reraise
@@ -124,6 +135,9 @@ def copy_current_request_context(f):
     the function is decorated a copy of the request context is created and
     then pushed when the function is called.
 
+    一个辅助函数，装饰一个函数来保留当前请求上下文。
+    这个在 greenlets 工作下有用处。
+
     Example::
 
         import gevent
@@ -202,6 +216,10 @@ class AppContext(object):
     context is also implicitly created if a request context is created
     but the application is not on top of the individual application
     context.
+
+    应用上下文绑定了应用对象实现的当前线程或greenlet。
+    类似于 :class:`RequestContext` 绑定请求信息。
+    
     """
 
     def __init__(self, app):
@@ -235,6 +253,9 @@ class AppContext(object):
             % (rv, self)
         appcontext_popped.send(self.app)
 
+    ###########################################################################
+    # 上下文
+
     def __enter__(self):
         self.push()
         return self
@@ -245,6 +266,7 @@ class AppContext(object):
         if BROKEN_PYPY_CTXMGR_EXIT and exc_type is not None:
             reraise(exc_type, exc_value, tb)
 
+    ###########################################################################
 
 class RequestContext(object):
     """The request context contains all request relevant information.  It is
@@ -252,9 +274,14 @@ class RequestContext(object):
     `_request_ctx_stack` and removed at the end of it.  It will create the
     URL adapter and request object for the WSGI environment provided.
 
+    request context包含所有请求相关信息。
+
     Do not attempt to use this class directly, instead use
     :meth:`~flask.Flask.test_request_context` and
     :meth:`~flask.Flask.request_context` to create this object.
+
+    不要尝试直接使用这个类，使用 :meth:`~flask.Flask.test_request_context` 和
+    :meth:`~flask.Flask.request_context` 代替创建这个对象。
 
     When the request context is popped, it will evaluate all the
     functions registered on the application for teardown execution
@@ -274,14 +301,18 @@ class RequestContext(object):
     information from the context local around for a little longer.  Make
     sure to properly :meth:`~werkzeug.LocalStack.pop` the stack yourself in
     that situation, otherwise your unittests will leak memory.
+
+    你可能会发现当你需要来自上下文信息进行测试的时候非常有用。
     """
 
     def __init__(self, app, environ, request=None):
         self.app = app
         if request is None:
-            request = app.request_class(environ)
+            # 使用 environ 创建一个 request
+            # app.request_class() 为 werkzeug.wrappers.Request 的继承类
+            request = app.request_class(environ)    
         self.request = request
-        self.url_adapter = app.create_url_adapter(self.request)
+        self.url_adapter = app.create_url_adapter(self.request) # URL调度器
         self.flashes = None
         self.session = None
 
@@ -310,7 +341,7 @@ class RequestContext(object):
         return _app_ctx_stack.top.g
     def _set_g(self, value):
         _app_ctx_stack.top.g = value
-    g = property(_get_g, _set_g)
+    g = property(_get_g, _set_g)    # 设置 g 方法
     del _get_g, _set_g
 
     def copy(self):
@@ -330,6 +361,9 @@ class RequestContext(object):
     def match_request(self):
         """Can be overridden by a subclass to hook into the matching
         of the request.
+
+        request URL匹配
+
         """
         try:
             url_rule, self.request.view_args = \
@@ -356,7 +390,7 @@ class RequestContext(object):
         # is an application context.
         app_ctx = _app_ctx_stack.top
         if app_ctx is None or app_ctx.app != self.app:
-            app_ctx = self.app.app_context()
+            app_ctx = self.app.app_context()    # 创建app context
             app_ctx.push()
             self._implicit_app_ctx_stack.append(app_ctx)
         else:
@@ -433,6 +467,9 @@ class RequestContext(object):
         else:
             self.pop(exc)
 
+    ###########################################################################
+    # 上下文
+
     def __enter__(self):
         self.push()
         return self
@@ -447,6 +484,8 @@ class RequestContext(object):
 
         if BROKEN_PYPY_CTXMGR_EXIT and exc_type is not None:
             reraise(exc_type, exc_value, tb)
+
+    ###########################################################################
 
     def __repr__(self):
         return '<%s \'%s\' [%s] of %s>' % (

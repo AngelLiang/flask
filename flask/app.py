@@ -928,12 +928,16 @@ class Flask(_PackageBoundObject):
         if server_name:
             sn_host, _, sn_port = server_name.partition(':')
 
+        # 优先使用 flask 的命令传参，由于设置了default host=127.0.0.1 port=5000
+        # 所以后面的参数不会生效
+        # 然后是 self.config.get('SERVER_NAME') 的参数，但是不会生效
+        # 最后是默认的 127.0.0.1:5000
         host = host or sn_host or _host
-        port = int(port or sn_port or _port)
+        port = int(port or sn_port or _port)    
 
         options.setdefault('use_reloader', self.debug)
         options.setdefault('use_debugger', self.debug)
-        options.setdefault('threaded', True)
+        options.setdefault('threaded', True)    # 默认开启线程
 
         cli.show_server_banner(self.env, self.debug, self.name, False)
 
@@ -1128,6 +1132,8 @@ class Flask(_PackageBoundObject):
         decorator.  If a view_func is provided it will be registered with the
         endpoint.
 
+        连接 URL 规则
+
         Basically this example::
 
             @app.route('/')
@@ -1213,7 +1219,7 @@ class Flask(_PackageBoundObject):
         rule = self.url_rule_class(rule, methods=methods, **options)
         rule.provide_automatic_options = provide_automatic_options
 
-        self.url_map.add(rule)
+        self.url_map.add(rule)  # 添加进 url_map 
         if view_func is not None:
             old_func = self.view_functions.get(endpoint)
             if old_func is not None and old_func != view_func:
@@ -1998,6 +2004,8 @@ class Flask(_PackageBoundObject):
         """Creates a URL adapter for the given request. The URL adapter
         is created at a point where the request context is not yet set
         up so the request is passed explicitly.
+
+        为指定的 request 创建一个 URL 调度。
 
         .. versionadded:: 0.6
 

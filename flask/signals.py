@@ -8,6 +8,9 @@
 
     :copyright: © 2010 by the Pallets team.
     :license: BSD, see LICENSE for more details.
+
+笔记：
+    信号机制，Flask使用了blinker实现
 """
 
 signals_available = False

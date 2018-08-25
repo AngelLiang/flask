@@ -14,20 +14,27 @@ __version__ = '1.0.2'
 
 # utilities we import from Werkzeug and Jinja2 that are unused
 # in the module but are exported as public interface.
+# abort 和 redirect 皆属于 werkzeug
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from jinja2 import Markup, escape
 
+# 请求和响应
 from .app import Flask, Request, Response
+# 配置
 from .config import Config
+# 辅助工具
 from .helpers import url_for, flash, send_file, send_from_directory, \
      get_flashed_messages, get_template_attribute, make_response, safe_join, \
      stream_with_context
+# 有关 ThreadLocal 的变量
 from .globals import current_app, g, request, session, _request_ctx_stack, \
      _app_ctx_stack
 from .ctx import has_request_context, has_app_context, \
      after_this_request, copy_current_request_context
+# 蓝本
 from .blueprints import Blueprint
+# 模板
 from .templating import render_template, render_template_string
 
 # the signals
@@ -45,5 +52,6 @@ from . import json
 jsonify = json.jsonify
 
 # backwards compat, goes away in 1.0
+# session
 from .sessions import SecureCookieSession as Session
 json_available = True

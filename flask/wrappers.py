@@ -7,6 +7,9 @@
 
     :copyright: © 2010 by the Pallets team.
     :license: BSD, see LICENSE for more details.
+
+笔记：
+    使用了 werkzeug 的 Request类 和 Response类 作为基本类
 """
 
 from werkzeug.exceptions import BadRequest
@@ -112,6 +115,8 @@ class Request(RequestBase, JSONMixin):
     """The request object used by default in Flask.  Remembers the
     matched endpoint and view arguments.
 
+    请求类
+
     It is what ends up as :class:`~flask.request`.  If you want to replace
     the request object used you can subclass this and set
     :attr:`~flask.Flask.request_class` to your subclass.
@@ -184,6 +189,8 @@ class Response(ResponseBase, JSONMixin):
     response object from Werkzeug but is set to have an HTML mimetype by
     default.  Quite often you don't have to create this object yourself because
     :meth:`~flask.Flask.make_response` will take care of that for you.
+
+    响应类
 
     If you want to replace the response object used you can subclass this and
     set :attr:`~flask.Flask.response_class` to your subclass.

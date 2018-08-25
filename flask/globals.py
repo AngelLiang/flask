@@ -53,9 +53,16 @@ def _find_app():
 
 
 # context locals
+
+# LocalStack：多线程或协程隔离的栈结构
 _request_ctx_stack = LocalStack()
 _app_ctx_stack = LocalStack()
+
 current_app = LocalProxy(_find_app)
+# 返回一个 _lookup_req_object 对象，_lookup_req_object 的形参默认值为 'request'
+# _lookup_req_object('request') # 获取当前请求上下文的 request
+# 把当前请求上下文的 request 作为全局变量
 request = LocalProxy(partial(_lookup_req_object, 'request'))
 session = LocalProxy(partial(_lookup_req_object, 'session'))
+# 把当前应用上下文的 g 作为全局变量
 g = LocalProxy(partial(_lookup_app_object, 'g'))

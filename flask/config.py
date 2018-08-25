@@ -113,6 +113,8 @@ class Config(dict):
         behaves as if the file was imported as module with the
         :meth:`from_object` function.
 
+        从 Python 文件更新 config 值。
+
         :param filename: the filename of the config.  This can either be an
                          absolute filename or a filename relative to the
                          root path.

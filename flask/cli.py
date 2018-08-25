@@ -7,6 +7,29 @@
 
     :copyright: © 2010 by the Pallets team.
     :license: BSD, see LICENSE for more details.
+
+
+笔记：
+    - def find_best_app()
+        查找最合适的app
+
+    - def call_factory()
+        调用工厂函数，也就是create_app
+
+    - def find_app_by_string()
+        通过字符串查找app
+
+    - def locate_app()
+        查找app
+
+    - def get_version()
+        获取版本号
+
+    - def show_server_banner()
+        显示server面板
+
+    - def load_dotenv()
+        加载dotenv
 """
 
 from __future__ import print_function
@@ -427,6 +450,7 @@ class AppGroup(click.Group):
         unless it's disabled by passing ``with_appcontext=False``.
         """
         wrap_for_ctx = kwargs.pop('with_appcontext', True)
+
         def decorator(f):
             if wrap_for_ctx:
                 f = with_appcontext(f)
@@ -545,7 +569,7 @@ class FlaskGroup(AppGroup):
         os.environ['FLASK_RUN_FROM_CLI'] = 'true'
 
         if get_load_dotenv(self.load_dotenv):
-            load_dotenv()
+            load_dotenv()   # 加载环境变量，所以每次使用 flask 命令都会有环境变量
 
         obj = kwargs.get('obj')
 
@@ -855,7 +879,7 @@ def routes_command(sort, all_methods):
     for rule, methods in zip(rules, rule_methods):
         click.echo(row.format(rule.endpoint, methods, rule.rule).rstrip())
 
-
+# banner
 cli = FlaskGroup(help="""\
 A general utility script for Flask applications.
 
