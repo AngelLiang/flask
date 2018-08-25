@@ -44,6 +44,9 @@ class Request(RequestBase):
     It is what ends up as :class:`~flask.request`.  If you want to replace
     the request object used you can subclass this and set
     :attr:`~flask.Flask.request_class` to your subclass.
+
+    请求类
+    记住匹配 endpoint 和 view 参数。
     """
 
     def __init__(self, environ):
@@ -60,6 +63,8 @@ class Response(ResponseBase):
 
     If you want to replace the response object used you can subclass this and
     set :attr:`~flask.Flask.request_class` to your subclass.
+
+    响应类
     """
     default_mimetype = 'text/html'
 
@@ -482,6 +487,7 @@ class Flask(object):
         """
         def decorator(f):
             self.add_url_rule(rule, f.__name__, **options)
+            # 将端点（默认使用函数名，即f.__name__）和函数对象的映射存储到view_functions字典
             self.view_functions[f.__name__] = f
             return f
         return decorator
@@ -538,9 +544,14 @@ class Flask(object):
         return value of the view or error handler.  This does not have to
         be a response object.  In order to convert the return value to a
         proper response object, call :func:`make_response`.
+
+        附注请求分发工作。匹配URL，返回view函数或错误处理器的返回值。
+        这个返回值不一定得是response对象。
+        为了将返回值返回值转换成合适的想要对象，需要调用make_response函数。
         """
         try:
             endpoint, values = self.match_request()
+            # 根据端点在view_functions字典内获取对应的视图函数并调用，传入视图参数
             return self.view_functions[endpoint](**values)
         except HTTPException, e:
             handler = self.error_handlers.get(e.code)
