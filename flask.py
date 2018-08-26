@@ -239,7 +239,12 @@ class Flask(object):
         self.package_name = package_name
 
         #: where is the app root located?
+        #: 定位程序的根目录。
         self.root_path = _get_package_path(self.package_name)
+
+        ###################################
+        # 下面是几个存储回调函数的字典或列表
+        ###################################
 
         #: a dictionary of all view functions registered.  The keys will
         #: be function names which are also used to generate URLs and
@@ -287,7 +292,7 @@ class Flask(object):
                 target = os.path.join(self.root_path, 'static')
             # SharedDataMiddleware中间件用来为程序添加处理静态文件的能力
             self.wsgi_app = SharedDataMiddleware(self.wsgi_app, {
-                self.static_path: target
+                self.static_path: target    # URL路径和实际文件目录（static文件夹）的映射
             })
 
         #: the Jinja2 environment.  It is created from the
