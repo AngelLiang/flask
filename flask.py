@@ -78,6 +78,10 @@ class _RequestContext(object):
     created at the beginning of the request and pushed to the
     `_request_ctx_stack` and removed at the end of it.  It will create the
     URL adapter and request object for the WSGI environment provided.
+
+    请求上下文包含所有请求有关信息。
+    它在请求初期创建，并push到`_request_ctx_stack`和在结束时remove。
+    它将创建URL adapter和WSGI环境提供的请求对象。
     """
 
     def __init__(self, app, environ):
@@ -281,6 +285,7 @@ class Flask(object):
                 target = (self.package_name, 'static')
             else:
                 target = os.path.join(self.root_path, 'static')
+            # SharedDataMiddleware中间件用来为程序添加处理静态文件的能力
             self.wsgi_app = SharedDataMiddleware(self.wsgi_app, {
                 self.static_path: target
             })
@@ -536,7 +541,8 @@ class Flask(object):
         is successful, otherwise the exception is stored.
         """
         rv = _request_ctx_stack.top.url_adapter.match()
-        request.endpoint, request.view_args = rv
+        # 把 endpoint 和 view_args 放入 request 里
+        request.endpoint, request.view_args = rv    
         return rv
 
     def dispatch_request(self):
@@ -598,6 +604,8 @@ class Flask(object):
         If any of these function returns a value it's handled as
         if it was the return value from the view and further
         request handling is stopped.
+
+        请求预处理
         """
         for func in self.before_request_funcs:
             rv = func()
@@ -620,6 +628,10 @@ class Flask(object):
             response = handler(response)
         return response
 
+    #########################################################################
+    # WSGI规定的可调用对象，从请求进入，到生成响应并返回的整个处理流程都发生在这里
+    #########################################################################
+
     def wsgi_app(self, environ, start_response):
         """The actual WSGI application.  This is not implemented in
         `__call__` so that middlewares can be applied:
@@ -630,13 +642,21 @@ class Flask(object):
         :param start_response: a callable accepting a status code,
                                a list of headers and an optional
                                exception context to start the response
+
+        实际的WSGI程序。它没有通过__call__实现，因此可以附加中间件：
+        
+            app.wsgi_app = MyMiddleware(app.wsgi_app)
+
+        :param environ: 一个WSGI环境。
+        :param start_response: 一个接受状态码的可调用对象，一个包含首部
+                               的列表以及一个可选的用于启动响应的异常上下文。
         """
         with self.request_context(environ):
-            rv = self.preprocess_request()
+            rv = self.preprocess_request()  # 预处理请求，调用所有使用了before_request钩子的函数
             if rv is None:
-                rv = self.dispatch_request()
-            response = self.make_response(rv)
-            response = self.process_response(response)
+                rv = self.dispatch_request()    # 请求分发，获得视图函数返回值（或是错误处理器的返回值）
+            response = self.make_response(rv)       # 生成response，把上面的返回值转换成响应对象
+            response = self.process_response(response)  # 处理response，调用所有使用了after_request钩子的函数
             return response(environ, start_response)
 
     def request_context(self, environ):
@@ -663,6 +683,7 @@ class Flask(object):
 
     def __call__(self, environ, start_response):
         """Shortcut for :attr:`wsgi_app`"""
+        # 调用 Flask 既相当于调用 self.wsgi_app()
         return self.wsgi_app(environ, start_response)
 
 
