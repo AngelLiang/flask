@@ -310,6 +310,9 @@ class Flask(object):
         the configured package is returned that looks up templates in the
         `templates` folder.  To add other loaders it's possible to
         override this method.
+
+        创建Jinja加载器。默认只是返回一个对应配置好的包的包加载器，它会从
+        templates文件夹中寻找模板。要添加其他加载器，可以重载这个方法。
         """
         if pkg_resources is None:
             return FileSystemLoader(os.path.join(self.root_path, 'templates'))
@@ -321,6 +324,8 @@ class Flask(object):
 
         :param context: the context as a dictionary that is updated in place
                         to add extra variables.
+
+        使用常用的变量更新模板上下文。这会注入request、session和g到模板上下文中。
         """
         reqctx = _request_ctx_stack.top
         for func in self.template_context_processors:
@@ -337,13 +342,16 @@ class Flask(object):
         :param options: the options to be forwarded to the underlying
                         Werkzeug server.  See :func:`werkzeug.run_simple`
                         for more information.
+
+        在本地开发服务器上运行程序。如果debug标志被设置，
+        这个服务器会在代码更改时自动重载，并会在异常发生时显示一个调试器。
         """
         from werkzeug import run_simple
         if 'debug' in options:
             self.debug = options.pop('debug')
         options.setdefault('use_reloader', self.debug)
         options.setdefault('use_debugger', self.debug)
-        return run_simple(host, port, self, **options)
+        return run_simple(host, port, self, **options)  # 阻塞启动
 
     def test_client(self):
         """Creates a test client for this application.  For information
@@ -384,6 +392,9 @@ class Flask(object):
         :attr:`secret_key` is set.
 
         :param request: an instance of :attr:`request_class`.
+
+        创建或打开一个新的session。默认的实现是存储所有的用户会话（session）
+        数据到一个签名的cookie中。这需要secret_key属性被设置。
         """
         key = self.secret_key
         if key is not None:
@@ -427,7 +438,7 @@ class Flask(object):
                         :class:`~werkzeug.routing.Rule` object
         """
         options['endpoint'] = endpoint
-        options.setdefault('methods', ('GET',))
+        options.setdefault('methods', ('GET',)) # 默认只有GET
         self.url_map.add(Rule(rule, **options))
 
     def route(self, rule, **options):
@@ -688,7 +699,7 @@ class Flask(object):
 
     def __call__(self, environ, start_response):
         """Shortcut for :attr:`wsgi_app`"""
-        # 调用 Flask 既相当于调用 self.wsgi_app()
+        # 调用 Flask 即相当于调用 self.wsgi_app() 
         return self.wsgi_app(environ, start_response)
 
 
