@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-flask.logging
-~~~~~~~~~~~~~
+    flask.logging
+    ~~~~~~~~~~~~~
 
-:copyright: © 2010 by the Pallets team.
-:license: BSD, see LICENSE for more details.
+    :copyright: © 2010 by the Pallets team.
+    :license: BSD, see LICENSE for more details.
+
+笔记：
+    日志模块
 """
 
 from __future__ import absolute_import

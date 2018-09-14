@@ -8,6 +8,9 @@
 
     :copyright: © 2010 by the Pallets team.
     :license: BSD, see LICENSE for more details.
+
+笔记：
+    蓝本模块
 """
 from functools import update_wrapper
 from werkzeug.urls import url_join
@@ -119,11 +122,22 @@ class Blueprint(_PackageBoundObject):
                  static_url_path=None, template_folder=None,
                  url_prefix=None, subdomain=None, url_defaults=None,
                  root_path=None):
+        """
+        :param name: 蓝本名字
+        :param import_name:
+        :param static_folder: 静态资源文件夹
+        :param static_url_path: 静态资源URL路径
+        :param template_folder: 模板文件夹
+        :param url_prefix: URL前缀
+        :param subdomain: 子域名
+        :param url_defaults:
+        :param root_path:
+        """
         _PackageBoundObject.__init__(self, import_name, template_folder,
                                      root_path=root_path)
         self.name = name
         self.url_prefix = url_prefix
-        self.subdomain = subdomain
+        self.subdomain = subdomain              
         self.static_folder = static_folder
         self.static_url_path = static_url_path
         self.deferred_functions = []

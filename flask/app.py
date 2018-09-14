@@ -1132,7 +1132,7 @@ class Flask(_PackageBoundObject):
         decorator.  If a view_func is provided it will be registered with the
         endpoint.
 
-        连接 URL 规则
+        绑定一个URL规则，把URL和endpoint绑定起来。
 
         Basically this example::
 
@@ -1291,6 +1291,8 @@ class Flask(_PackageBoundObject):
     @setupmethod
     def errorhandler(self, code_or_exception):
         """Register a function to handle errors by code or exception class.
+
+        注册一个处理错误函数，需要一个HTTP状态码或异常类。
 
         A decorator that is used to register a function given an
         error code.  Example::
