@@ -1616,9 +1616,17 @@ class Flask(_PackageBoundObject):
         blueprint handler for a specific code, app handler for a specific code,
         blueprint handler for an exception class, app handler for an exception
         class, or ``None`` if a suitable handler is not found.
+
+        以下面顺序方式，给一个exception返回一个已经注册的error handler
+        1. blueprint handler for a specific code
+        2. app handler for a specific code
+        3. blueprint handler for an exception class
+        4. app handler for an exception class
+        5. 如果没有找到合适的handler，返回None
         """
         exc_class, code = self._get_exc_class_and_code(type(e))
 
+        # 以for循环方式查找，O(n)
         for name, c in (
             (request.blueprint, code), (None, code),
             (request.blueprint, None), (None, None)
