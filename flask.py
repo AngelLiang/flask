@@ -45,7 +45,7 @@ class Request(RequestBase):
     the request object used you can subclass this and set
     :attr:`~flask.Flask.request_class` to your subclass.
 
-    请求类
+    请求类，继承了 werkzeug 的 Request
     记住匹配 endpoint 和 view 参数。
     """
 
@@ -64,7 +64,7 @@ class Response(ResponseBase):
     If you want to replace the response object used you can subclass this and
     set :attr:`~flask.Flask.request_class` to your subclass.
 
-    响应类
+    响应类，继承了 werkzeug 的 Response
     """
     default_mimetype = 'text/html'
 
@@ -80,8 +80,8 @@ class _RequestContext(object):
     URL adapter and request object for the WSGI environment provided.
 
     请求上下文包含所有请求有关信息。
-    它在请求初期创建，并push到`_request_ctx_stack`和在结束时remove。
-    它将创建URL adapter和WSGI环境提供的请求对象。
+    它在请求初期创建，并 push 到 `_request_ctx_stack` ，并在结束时 remove 。
+    它将创建 URL adapter 和 WSGI 环境提供的 request 对象。
     """
 
     def __init__(self, app, environ):
@@ -118,6 +118,8 @@ def flash(message):
     the template has to call :func:`get_flashed_messages`.
 
     :param message: the message to be flashed.
+
+    本质上是把 message 放入 cookies， 并传给前端。
     """
     session['_flashes'] = (session.get('_flashes', [])) + [message]
 
@@ -198,6 +200,8 @@ class Flask(object):
         from flask import Flask
         app = Flask(__name__)
     """
+
+    # 组合 request 类和 response 类
 
     #: the class that is used for request objects.  See :class:`~flask.request`
     #: for more information.
@@ -311,8 +315,9 @@ class Flask(object):
         `templates` folder.  To add other loaders it's possible to
         override this method.
 
-        创建Jinja加载器。默认只是返回一个对应配置好的包的包加载器，它会从
-        templates文件夹中寻找模板。要添加其他加载器，可以重载这个方法。
+        创建Jinja加载器。
+        默认只是返回一个对应配置好的包的包加载器，它会从templates文件夹中寻找模板。
+        要添加其他加载器，可以重载这个方法。
         """
         if pkg_resources is None:
             return FileSystemLoader(os.path.join(self.root_path, 'templates'))
@@ -325,7 +330,7 @@ class Flask(object):
         :param context: the context as a dictionary that is updated in place
                         to add extra variables.
 
-        使用常用的变量更新模板上下文。这会注入request、session和g到模板上下文中。
+        使用常用的变量更新模板上下文。这会注入 request 、 session 和 g 到模板上下文中。
         """
         reqctx = _request_ctx_stack.top
         for func in self.template_context_processors:
@@ -343,8 +348,9 @@ class Flask(object):
                         Werkzeug server.  See :func:`werkzeug.run_simple`
                         for more information.
 
-        在本地开发服务器上运行程序。如果debug标志被设置，
-        这个服务器会在代码更改时自动重载，并会在异常发生时显示一个调试器。
+        在本地开发服务器上运行程序。
+        如果 debug 标志被设置，这个服务器会在代码更改时自动重载，
+        并会在异常发生时显示一个调试器。
         """
         from werkzeug import run_simple
         if 'debug' in options:
@@ -393,8 +399,9 @@ class Flask(object):
 
         :param request: an instance of :attr:`request_class`.
 
-        创建或打开一个新的session。默认的实现是存储所有的用户会话（session）
-        数据到一个签名的cookie中。这需要secret_key属性被设置。
+        创建或打开一个新的session。
+        默认的实现是存储所有的用户会话（session）数据到一个签名的 cookie 中。
+        这需要先设置 secret_key 属性。
         """
         key = self.secret_key
         if key is not None:
@@ -438,7 +445,7 @@ class Flask(object):
                         :class:`~werkzeug.routing.Rule` object
         """
         options['endpoint'] = endpoint
-        options.setdefault('methods', ('GET',)) # 默认只有GET
+        options.setdefault('methods', ('GET',))  # 默认给 URL 设置 GET 方法
         self.url_map.add(Rule(rule, **options))
 
     def route(self, rule, **options):
@@ -508,7 +515,7 @@ class Flask(object):
         """
         def decorator(f):
             self.add_url_rule(rule, f.__name__, **options)
-            # 将端点（默认使用函数名，即f.__name__）和函数对象的映射存储到view_functions字典
+            # 将端点（默认使用函数名，即 f.__name__ ）和函数对象的映射存储到 view_functions 字典
             self.view_functions[f.__name__] = f
             return f
         return decorator
@@ -558,7 +565,7 @@ class Flask(object):
         """
         rv = _request_ctx_stack.top.url_adapter.match()
         # 把 endpoint 和 view_args 放入 request 里
-        request.endpoint, request.view_args = rv    
+        request.endpoint, request.view_args = rv
         return rv
 
     def dispatch_request(self):
@@ -573,9 +580,9 @@ class Flask(object):
         """
         try:
             endpoint, values = self.match_request()
-            # 根据端点在view_functions字典内获取对应的视图函数并调用，传入视图参数
+            # 根据端点在 view_functions 字典内获取对应的视图函数并调用，传入视图参数
             return self.view_functions[endpoint](**values)
-        except HTTPException, e:    # 如果抛出HTTPException异常
+        except HTTPException, e:    # 如果抛出 HTTPException 异常
             handler = self.error_handlers.get(e.code)
             if handler is None:
                 return e
@@ -621,7 +628,7 @@ class Flask(object):
         if it was the return value from the view and further
         request handling is stopped.
 
-        请求预处理
+        request 预处理
         """
         for func in self.before_request_funcs:
             rv = func()
@@ -636,6 +643,8 @@ class Flask(object):
         :param response: a :attr:`response_class` object.
         :return: a new response object or the same, has to be an
                  instance of :attr:`response_class`.
+
+        处理 response
         """
         session = _request_ctx_stack.top.session
         if session is not None:
@@ -659,15 +668,15 @@ class Flask(object):
                                a list of headers and an optional
                                exception context to start the response
 
-        实际的WSGI程序。它没有通过__call__实现，因此可以附加中间件：
-        
+        实际的 WSGI 程序。它没有通过 __call__ 实现，因此可以附加中间件：
+
             app.wsgi_app = MyMiddleware(app.wsgi_app)
 
         :param environ: 一个WSGI环境。
         :param start_response: 一个接受状态码的可调用对象，一个包含首部
                                的列表以及一个可选的用于启动响应的异常上下文。
         """
-        with self.request_context(environ):
+        with self.request_context(environ):  # 传入 environ 并生成 requset 上下文
             rv = self.preprocess_request()  # 预处理请求，调用所有使用了before_request钩子的函数
             if rv is None:
                 rv = self.dispatch_request()    # 请求分发，获得视图函数返回值（或是错误处理器的返回值）
@@ -687,6 +696,8 @@ class Flask(object):
                 do_something_with(request)
 
         :params environ: a WSGI environment
+
+        从传入的环境和绑定的当前上下文，创建 request 上下文
         """
         return _RequestContext(self, environ)
 
@@ -699,10 +710,11 @@ class Flask(object):
 
     def __call__(self, environ, start_response):
         """Shortcut for :attr:`wsgi_app`"""
-        # 调用 Flask 即相当于调用 self.wsgi_app() 
+        # 调用 Flask 即相当于调用 self.wsgi_app()
         return self.wsgi_app(environ, start_response)
 
 
+# 上下文局部变量
 # context locals
 _request_ctx_stack = LocalStack()
 current_app = LocalProxy(lambda: _request_ctx_stack.top.app)
