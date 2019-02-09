@@ -24,6 +24,15 @@ class JSONMixin(object):
     parsing capabilities.
 
     .. versionadded:: 1.0
+
+    Usage:
+
+        ```
+        from flask import request
+        if request.is_json:
+            request_json = request.json
+            # ...
+        ```
     """
 
     _cached_json = (Ellipsis, Ellipsis)
@@ -61,9 +70,9 @@ class JSONMixin(object):
 
         :param force: Ignore the mimetype and always try to parse JSON.
         :param silent: Silence parsing errors and return ``None``
-            instead.
+            instead.  安静地解析错误并返回 `None`
         :param cache: Store the parsed JSON to return for subsequent
-            calls.
+            calls.  缓存解析的JSON返回给后来的调用
         """
         if cache and self._cached_json[silent] is not Ellipsis:
             return self._cached_json[silent]

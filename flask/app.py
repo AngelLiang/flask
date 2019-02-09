@@ -1876,6 +1876,8 @@ class Flask(_PackageBoundObject):
         This can be changed through subclassing to change the default
         behavior of ``OPTIONS`` responses.
 
+        这个方法被调用时会创建默认的`OPTIONS`响应。
+
         .. versionadded:: 0.7
         """
         adapter = _request_ctx_stack.top.url_adapter
