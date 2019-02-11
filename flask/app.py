@@ -1805,16 +1805,19 @@ class Flask(_PackageBoundObject):
            This no longer does the exception handling, this code was
            moved to the new :meth:`full_dispatch_request`.
         """
+        # 直接从请求上下文对象（_request_ctx_stack.top.request）的url_rule属性获取
         req = _request_ctx_stack.top.request
         if req.routing_exception is not None:
             self.raise_routing_exception(req)
         rule = req.url_rule
         # if we provide automatic options for this URL and the
         # request came with the OPTIONS method, reply automatically
+        # 如果为这个URL提供了自动选项并且方法为OPTIONS，则自动处理
         if getattr(rule, 'provide_automatic_options', False) \
            and req.method == 'OPTIONS':
             return self.make_default_options_response()
         # otherwise dispatch to the handler for that endpoint
+        # 否则调用对应的视图函数
         return self.view_functions[rule.endpoint](**req.view_args)
 
     def full_dispatch_request(self):
@@ -2031,7 +2034,7 @@ class Flask(_PackageBoundObject):
         is created at a point where the request context is not yet set
         up so the request is passed explicitly.
 
-        为指定的 request 创建一个 URL 调度。
+            为指定的 request 创建一个 URL 调度。
 
         .. versionadded:: 0.6
 
@@ -2047,6 +2050,8 @@ class Flask(_PackageBoundObject):
             # If subdomain matching is disabled (the default), use the
             # default subdomain in all cases. This should be the default
             # in Werkzeug but it currently does not have that feature.
+            # 如果子域名匹配出于关闭状态（默认值）
+            # 就在各处使用默认的子域名
             subdomain = ((self.url_map.default_subdomain or None)
                          if not self.subdomain_matching else None)
             return self.url_map.bind_to_environ(
