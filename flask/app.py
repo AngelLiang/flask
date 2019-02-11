@@ -1798,6 +1798,9 @@ class Flask(_PackageBoundObject):
         be a response object.  In order to convert the return value to a
         proper response object, call :func:`make_response`.
 
+            请求调度。匹配URL并返回view或错误处理的返回值。
+            这里还没有变成response对象
+
         .. versionchanged:: 0.7
            This no longer does the exception handling, this code was
            moved to the new :meth:`full_dispatch_request`.
@@ -1819,12 +1822,16 @@ class Flask(_PackageBoundObject):
         pre and postprocessing as well as HTTP exception catching and
         error handling.
 
+            分派请求，并在此之上执行请求的预处理和后处理以及HTTP异常捕获和
+            错误处理。
+
         .. versionadded:: 0.7
         """
         self.try_trigger_before_first_request_functions()
         try:
             request_started.send(self)
-            rv = self.preprocess_request()
+            # 会执行所有使用before_request钩子注册的函数。
+            rv = self.preprocess_request()  # 请求预处理
             if rv is None:
                 rv = self.dispatch_request()
         except Exception as e:
@@ -1837,17 +1844,24 @@ class Flask(_PackageBoundObject):
         postprocessing functions.  This is invoked for both normal
         request dispatching as well as error handlers.
 
+            给定视图函数的返回值，这将通过将请求转换为响应并调用后处理函数
+            来完成请求。这是为正常的请求调度和错误处理程序调用的。
+
         Because this means that it might be called as a result of a
         failure a special safe mode is available which can be enabled
         with the `from_error_handler` flag.  If enabled, failures in
         response processing will be logged and otherwise ignored.
 
         :internal:
+
+        :param rv: view function或错误处理返回的返回值
         """
-        response = self.make_response(rv)
+        response = self.make_response(rv)   # 生成response对象
         try:
+            # 执行所有使用after_request钩子注册的函数
+            # 此时response是response对象
             response = self.process_response(response)
-            request_finished.send(self, response=response)
+            request_finished.send(self, response=response)  # 发送信号
         except Exception:
             if not from_error_handler:
                 raise
