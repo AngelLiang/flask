@@ -1832,14 +1832,14 @@ class Flask(_PackageBoundObject):
         """
         self.try_trigger_before_first_request_functions()
         try:
-            request_started.send(self)
-            # 会执行所有使用before_request钩子注册的函数。
+            request_started.send(self)  # 发送“请求开始”信号
+            # preprocess_request() 会执行所有使用before_request钩子注册的函数。
             rv = self.preprocess_request()  # 请求预处理
             if rv is None:
-                rv = self.dispatch_request()
+                rv = self.dispatch_request()    # 进一步处理请求，获取返回值
         except Exception as e:
-            rv = self.handle_user_exception(e)
-        return self.finalize_request(rv)
+            rv = self.handle_user_exception(e)  # 处理异常
+        return self.finalize_request(rv)    # 最终处理
 
     def finalize_request(self, rv, from_error_handler=False):
         """Given the return value from a view function this finalizes
@@ -1861,10 +1861,10 @@ class Flask(_PackageBoundObject):
         """
         response = self.make_response(rv)   # 生成response对象
         try:
-            # 执行所有使用after_request钩子注册的函数
+            # process_response() 执行所有使用after_request钩子注册的函数
             # 此时response是response对象
             response = self.process_response(response)
-            request_finished.send(self, response=response)  # 发送信号
+            request_finished.send(self, response=response)  # 发送“请求结束”信号
         except Exception:
             if not from_error_handler:
                 raise
