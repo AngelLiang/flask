@@ -10,7 +10,7 @@
 
 笔记：
     在 itsdangerous 基础上实现的 sessions 的 cookie
-    Flask的 session 本质上就是 cookie 
+    Flask 的 session 本质上就是 cookie，因为存放到了cookie
 """
 
 import hashlib

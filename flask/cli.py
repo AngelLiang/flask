@@ -441,6 +441,9 @@ class AppGroup(click.Group):
     changes the behavior of the :meth:`command` decorator so that it
     automatically wraps the functions in :func:`with_appcontext`.
 
+    这个类工作类似于 :class:`~click.Group` ， 但它改变了 :meth:`command`
+    装饰器的行为，这样它能自动包装 :func:`with_appcontext` 。
+
     Not to be confused with :class:`FlaskGroup`.
     """
 
@@ -453,7 +456,7 @@ class AppGroup(click.Group):
 
         def decorator(f):
             if wrap_for_ctx:
-                f = with_appcontext(f)
+                f = with_appcontext(f)  # Add with_appcontext
             return click.Group.command(self, *args, **kwargs)(f)
         return decorator
 
@@ -500,6 +503,7 @@ class FlaskGroup(AppGroup):
         self.create_app = create_app
         self.load_dotenv = load_dotenv
 
+        # 添加默认的命令
         if add_default_commands:
             self.add_command(run_command)
             self.add_command(shell_command)
@@ -620,6 +624,7 @@ def load_dotenv(path=None):
 
     new_dir = None
 
+    # 从 .env 和 .flask 加载变量，后加载变量不覆盖前变量
     for name in ('.env', '.flaskenv'):
         path = dotenv.find_dotenv(name, usecwd=True)
 

@@ -2109,6 +2109,9 @@ class Flask(_PackageBoundObject):
         If any :meth:`before_request` handler returns a non-None value, the
         value is handled as if it was the return value from the view, and
         further request handling is stopped.
+
+        请求预处理。
+        当请求调度之前会调用。
         """
 
         bp = _request_ctx_stack.top.request.blueprint
