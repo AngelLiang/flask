@@ -9,25 +9,25 @@
     :license: BSD, see LICENSE for more details.
 
 笔记：
-    - def get_env():
+    - :func:`get_env`:
         获取当前环境变量
 
-    - def get_debug_flag():
+    - :func:`get_debug_flag`:
         获取debug标志
 
-    - def get_load_dotenv():
+    - :func:`get_load_dotenv`:
         获取 dotenv 环境变量
 
-    - def send_file():
+    - :func:`send_file`:
         发送文件
 
-    - def send_from_directory():
+    - :func:`send_from_directory`:
         从目录中发送文件
 
-    - def total_seconds():
+    - :func:`total_seconds`:
         计算总秒数
 
-    - def is_ip():
+    - :func:`is_ip`:
         是否是ip
 """
 

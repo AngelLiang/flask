@@ -8,6 +8,10 @@
 
 笔记：
     日志模块
+
+    :func:`wsgi_errors_stream`
+    :func:`has_level_handler`
+    :func:`create_logger`
 """
 
 from __future__ import absolute_import
