@@ -35,6 +35,7 @@ documentation for more information.\
 
 
 def _lookup_req_object(name):
+    """获取当前栈顶请求对象的某个name属性"""
     top = _request_ctx_stack.top
     if top is None:
         raise RuntimeError(_request_ctx_err_msg)
@@ -42,6 +43,7 @@ def _lookup_req_object(name):
 
 
 def _lookup_app_object(name):
+    """获取当前栈顶app对象的某个name属性"""
     top = _app_ctx_stack.top
     if top is None:
         raise RuntimeError(_app_ctx_err_msg)
@@ -49,6 +51,7 @@ def _lookup_app_object(name):
 
 
 def _find_app():
+    """获取当前栈顶的app对象"""
     top = _app_ctx_stack.top
     if top is None:
         raise RuntimeError(_app_ctx_err_msg)
@@ -57,15 +60,18 @@ def _find_app():
 
 # context locals
 
-# LocalStack：多线程或协程隔离的栈结构
+# LocalStack：多线程/协程隔离的栈结构
 _request_ctx_stack = LocalStack()
 _app_ctx_stack = LocalStack()
 
 current_app = LocalProxy(_find_app)
+
+# partial: 偏函数
 # 返回一个 _lookup_req_object 对象，_lookup_req_object 的形参默认值为 'request'
-# _lookup_req_object('request') # 获取当前请求上下文的 request
+# _lookup_req_object('request')  # 获取当前请求上下文的 request
 # 把当前请求上下文的 request 作为全局变量
-request = LocalProxy(partial(_lookup_req_object, 'request'))
-session = LocalProxy(partial(_lookup_req_object, 'session'))
+request = LocalProxy(partial(_lookup_req_object, 'request'))    # werkzeug.Local.__storage__[get_ident()]['request']
+session = LocalProxy(partial(_lookup_req_object, 'session'))    # werkzeug.Local.__storage__[get_ident()]['session']
+
 # 把当前应用上下文的 g 作为全局变量
-g = LocalProxy(partial(_lookup_app_object, 'g'))
+g = LocalProxy(partial(_lookup_app_object, 'g'))    # werkzeug.Local.__storage__[get_ident()]['g']
