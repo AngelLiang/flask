@@ -236,8 +236,8 @@ class AppContext(object):
         self._refcnt += 1
         if hasattr(sys, 'exc_clear'):
             sys.exc_clear()
-        _app_ctx_stack.push(self)
-        appcontext_pushed.send(self.app)
+        _app_ctx_stack.push(self)   # app stack入栈
+        appcontext_pushed.send(self.app)    # 发送信号
 
     def pop(self, exc=_sentinel):
         """Pops the app context."""
@@ -248,13 +248,13 @@ class AppContext(object):
                     exc = sys.exc_info()[1]
                 self.app.do_teardown_appcontext(exc)
         finally:
-            rv = _app_ctx_stack.pop()
+            rv = _app_ctx_stack.pop()   # app stack 出栈
         assert rv is self, 'Popped wrong app context.  (%r instead of %r)' \
             % (rv, self)
-        appcontext_popped.send(self.app)
+        appcontext_popped.send(self.app)    # 发送信号
 
     ###########################################################################
-    # 上下文
+    # 上下文实现
 
     def __enter__(self):
         self.push()
@@ -367,7 +367,7 @@ class RequestContext(object):
         """Can be overridden by a subclass to hook into the matching
         of the request.
 
-            request URL匹配
+            匹配request URL
 
         """
         try:
@@ -473,7 +473,7 @@ class RequestContext(object):
             self.pop(exc)
 
     ###########################################################################
-    # 上下文
+    # 上下文处理
 
     def __enter__(self):
         self.push()
