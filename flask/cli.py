@@ -852,19 +852,23 @@ def shell_command():
 @with_appcontext
 def routes_command(sort, all_methods):
     """Show all registered routes with endpoints and methods."""
+    """显示所有已经注册的路由，附带endpoint和method"""
 
     rules = list(current_app.url_map.iter_rules())
     if not rules:
         click.echo('No routes were registered.')
         return
 
+    # 忽略的方法
     ignored_methods = set(() if all_methods else ('HEAD', 'OPTIONS'))
 
+    # 排序
     if sort in ('endpoint', 'rule'):
         rules = sorted(rules, key=attrgetter(sort))
     elif sort == 'methods':
         rules = sorted(rules, key=lambda rule: sorted(rule.methods))
 
+    # rule的方法转换为list
     rule_methods = [
         ', '.join(sorted(rule.methods - ignored_methods)) for rule in rules
     ]
