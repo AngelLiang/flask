@@ -152,6 +152,7 @@ class MethodView(with_metaclass(MethodViewType, View)):
     """
 
     def dispatch_request(self, *args, **kwargs):
+        """请求调度"""
         # 通过小写请求method获取当前类的方法接口
         meth = getattr(self, request.method.lower(), None)
 
