@@ -441,6 +441,8 @@ class Blueprint(_PackageBoundObject):
         special case is the 500 internal server error which is always looked
         up from the application.
 
+        注册一个错误处理，只对该蓝本激活。
+
         Otherwise works as the :meth:`~flask.Flask.errorhandler` decorator
         of the :class:`~flask.Flask` object.
         """
