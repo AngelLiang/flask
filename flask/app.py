@@ -441,6 +441,11 @@ class Flask(_PackageBoundObject):
         #: example be used to close database connections. To register a function
         #: here, use the :meth:`after_request` decorator.
         self.after_request_funcs = {}
+        """
+        一个字典，附有每个请求之后应该调用的函数的队列。字典的key是蓝本名称。
+        如果 key 是 None ，则表示是对所有请求生效。
+        需要把函数注册到这里，请用 :meth:`after_request` 装饰器。
+        """
 
         #: A dictionary with lists of functions that are called after
         #: each request, even if an exception has occurred. The key of the
@@ -2145,15 +2150,22 @@ class Flask(_PackageBoundObject):
         """
         ctx = _request_ctx_stack.top
         bp = ctx.request.blueprint
-        funcs = ctx._after_request_functions
+        funcs = ctx._after_request_functions  # 获取所有请求后的处理函数
+
+        # 蓝本请求后处理函数
         if bp is not None and bp in self.after_request_funcs:
             funcs = chain(funcs, reversed(self.after_request_funcs[bp]))
+        # 全局请求后处理函数
         if None in self.after_request_funcs:
             funcs = chain(funcs, reversed(self.after_request_funcs[None]))
+
+        # 调用函数
         for handler in funcs:
             response = handler(response)
+
         if not self.session_interface.is_null_session(ctx.session):
             self.session_interface.save_session(self, ctx.session, response)
+        # 返回响应
         return response
 
     def do_teardown_request(self, exc=_sentinel):

@@ -343,6 +343,8 @@ class Blueprint(_PackageBoundObject):
         """Like :meth:`Flask.after_request` but for a blueprint.  This function
         is only executed after each request that is handled by a function of
         that blueprint.
+
+        给蓝本注册请求后回调函数
         """
         self.record_once(lambda s: s.app.after_request_funcs
             .setdefault(self.name, []).append(f))
