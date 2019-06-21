@@ -195,6 +195,8 @@ def has_request_context():
                 self.remote_addr = remote_addr
 
     .. versionadded:: 0.7
+
+    是否有请求上下文
     """
     return _request_ctx_stack.top is not None
 
@@ -205,6 +207,8 @@ def has_app_context():
     :data:`current_app` object instead.
 
     .. versionadded:: 0.9
+
+    是否有应用上下文
     """
     return _app_ctx_stack.top is not None
 
