@@ -649,6 +649,7 @@ class Flask(object):
         session = _request_ctx_stack.top.session
         if session is not None:
             self.save_session(session, response)
+        # 循环调用 after_request_funcs 列表处理函数
         for handler in self.after_request_funcs:
             response = handler(response)
         return response
@@ -677,11 +678,15 @@ class Flask(object):
                                的列表以及一个可选的用于启动响应的异常上下文。
         """
         with self.request_context(environ):  # 传入 environ 并生成 requset 上下文
-            rv = self.preprocess_request()  # 预处理请求，调用所有使用了before_request钩子的函数
+            # 预处理请求，调用所有注册在 before_request 钩子的函数
+            rv = self.preprocess_request()
             if rv is None:
-                rv = self.dispatch_request()    # 请求分发，获得视图函数返回值（或是错误处理器的返回值）
-            response = self.make_response(rv)       # 生成response，把上面的返回值转换成响应对象
-            response = self.process_response(response)  # 处理response，调用所有使用了after_request钩子的函数
+                # 请求分发，获得视图函数返回值（或是错误处理器的返回值）
+                rv = self.dispatch_request()
+            # 生成 response ，把上面的返回值转换成 response 对象
+            response = self.make_response(rv)
+            # 处理 response ，调用所有注册在 after_request 钩子的函数，传参是一个 response 对象
+            response = self.process_response(response)
             return response(environ, start_response)
 
     def request_context(self, environ):
