@@ -367,6 +367,7 @@ def jsonify(*args, **kwargs):
         data = args or kwargs
 
     return current_app.response_class(
+        # 第一个参数类型是字符串
         dumps(data, indent=indent, separators=separators) + "\n",
         mimetype=current_app.config["JSONIFY_MIMETYPE"],
     )
