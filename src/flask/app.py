@@ -2108,6 +2108,7 @@ class Flask(_PackageBoundObject):
                 rv = self.response_class(rv, status=status, headers=headers)
                 status = headers = None
             elif isinstance(rv, dict):
+                # https://github.com/pallets/flask/pull/3111
                 rv = jsonify(rv)
             elif isinstance(rv, BaseResponse) or callable(rv):
                 # evaluate a WSGI callable, or coerce a different response
