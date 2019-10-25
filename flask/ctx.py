@@ -408,6 +408,7 @@ class RequestContext(object):
         if hasattr(sys, 'exc_clear'):
             sys.exc_clear()
 
+        # 将当前请求上下文，压入 flask._request_ctx_stack 的栈中
         _request_ctx_stack.push(self)
 
         # Open the session at the moment that the request context is available.
@@ -454,6 +455,7 @@ class RequestContext(object):
                     request_close()
                 clear_request = True
         finally:
+            # 将请求上下文从栈里弹出，避免内存无法回收。
             rv = _request_ctx_stack.pop()
 
             # get rid of circular dependencies at the end of the request
@@ -469,6 +471,7 @@ class RequestContext(object):
                 '(%r instead of %r)' % (rv, self)
 
     def auto_pop(self, exc):
+        """自动弹出"""
         if self.request.environ.get('flask._preserve_context') or \
            (exc is not None and self.app.preserve_context_on_exception):
             self.preserved = True

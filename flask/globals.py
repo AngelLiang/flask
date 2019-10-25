@@ -35,7 +35,12 @@ documentation for more information.\
 
 
 def _lookup_req_object(name):
-    """获取当前栈顶请求对象的某个name属性"""
+    """获取当前栈顶请求对象的某个name属性。
+
+    请求上下文压入栈后，再次访问其都会从这个栈的顶端通过 _request_ctx_stack.top
+    来获取，所以取到的永远是只属于本线程中的对象，这样
+    不同请求之间的上下文就做到了完全隔离。
+    """
     top = _request_ctx_stack.top
     if top is None:
         raise RuntimeError(_request_ctx_err_msg)
@@ -61,6 +66,7 @@ def _find_app():
 # context locals
 
 # LocalStack：多线程/协程隔离的栈结构
+# 在应用开发时不会使用上面的变量，一般在Flask扩展开发中才会使用
 _request_ctx_stack = LocalStack()
 _app_ctx_stack = LocalStack()
 
