@@ -93,6 +93,7 @@ class _RequestContext(object):
         self.flashes = None
 
     def __enter__(self):
+        # 将当前请求上下文压入栈中
         _request_ctx_stack.push(self)
 
     def __exit__(self, exc_type, exc_value, tb):
@@ -100,7 +101,8 @@ class _RequestContext(object):
         # exception happened.  This will allow the debugger to still
         # access the request object in the interactive shell.
         if tb is None or not self.app.debug:
-            _request_ctx_stack.pop()
+            _request_ctx_stack.pop()  # 将请求上下文从栈里弹出
+
 
 
 def url_for(endpoint, **values):
