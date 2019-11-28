@@ -87,11 +87,15 @@ class View(object):
 
         The arguments passed to :meth:`as_view` are forwarded to the
         constructor of the class.
+
+        这在内部生成了一个函数，它将在每个请求实例化 :class:`View`，
+        并调用 :meth:`dispatch_request` 方法。
         """
         def view(*args, **kwargs):
             self = view.view_class(*class_args, **class_kwargs)
             return self.dispatch_request(*args, **kwargs)
 
+        # 包裹装饰器
         if cls.decorators:
             view.__name__ = name
             view.__module__ = cls.__module__

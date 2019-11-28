@@ -333,6 +333,7 @@ class Flask(_PackageBoundObject):
     #: :class:`~flask.sessions.SecureCookieSessionInterface` is used here.
     #:
     #: .. versionadded:: 0.8
+    # 设置默认的 session_interface， 默认使用 cookies 保存 session
     session_interface = SecureCookieSessionInterface()
 
     # TODO remove the next three attrs when Sphinx :inherited-members: works

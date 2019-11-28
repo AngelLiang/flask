@@ -313,6 +313,8 @@ session_json_serializer = TaggedJSONSerializer()
 class SecureCookieSessionInterface(SessionInterface):
     """The default session interface that stores sessions in signed cookies
     through the :mod:`itsdangerous` module.
+
+    默认的 session 接口，在签名的 cookies 里保存 sessions
     """
     #: the salt that should be applied on top of the secret key for the
     #: signing of cookie based sessions.
@@ -341,9 +343,11 @@ class SecureCookieSessionInterface(SessionInterface):
                                       signer_kwargs=signer_kwargs)
 
     def open_session(self, app, request):
+        """override"""
         s = self.get_signing_serializer(app)
         if s is None:
             return None
+        # 从 cookies 获取数据
         val = request.cookies.get(app.session_cookie_name)
         if not val:
             return self.session_class()
@@ -355,6 +359,7 @@ class SecureCookieSessionInterface(SessionInterface):
             return self.session_class()
 
     def save_session(self, app, session, response):
+        """override"""
         domain = self.get_cookie_domain(app)
         path = self.get_cookie_path(app)
 
@@ -382,7 +387,7 @@ class SecureCookieSessionInterface(SessionInterface):
         samesite = self.get_cookie_samesite(app)
         expires = self.get_expiration_time(app, session)
         val = self.get_signing_serializer(app).dumps(dict(session))
-        # 设置 cookie
+        # 设置数据到 cookie
         response.set_cookie(
             app.session_cookie_name,
             val,
