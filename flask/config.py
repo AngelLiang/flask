@@ -96,6 +96,10 @@ class Config(dict):
         :param silent: set to ``True`` if you want silent failure for missing
                        files.
         :return: bool. ``True`` if able to load config, ``False`` otherwise.
+
+
+        从 envvar 文件更新配置， variable_name 是环境变量名称
+        返回一个文件路径
         """
         rv = os.environ.get(variable_name)
         if not rv:
@@ -113,8 +117,6 @@ class Config(dict):
         behaves as if the file was imported as module with the
         :meth:`from_object` function.
 
-        从 Python 文件更新 config 值。
-
         :param filename: the filename of the config.  This can either be an
                          absolute filename or a filename relative to the
                          root path.
@@ -123,6 +125,10 @@ class Config(dict):
 
         .. versionadded:: 0.7
            `silent` parameter.
+
+
+        从 Python 文件更新配置。 filename 是相对路径
+
         """
         filename = os.path.join(self.root_path, filename)
         d = types.ModuleType('config')
