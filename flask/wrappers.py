@@ -72,7 +72,7 @@ class JSONMixin(object):
         :param silent: Silence parsing errors and return ``None``
             instead.  安静地解析错误并返回 `None`
         :param cache: Store the parsed JSON to return for subsequent
-            calls.  缓存解析的JSON返回给后来的调用
+            calls.  缓存解析好的JSON，返回给后来调用
         """
         if cache and self._cached_json[silent] is not Ellipsis:
             return self._cached_json[silent]
@@ -124,8 +124,6 @@ class Request(RequestBase, JSONMixin):
     """The request object used by default in Flask.  Remembers the
     matched endpoint and view arguments.
 
-    请求类
-
     It is what ends up as :class:`~flask.request`.  If you want to replace
     the request object used you can subclass this and set
     :attr:`~flask.Flask.request_class` to your subclass.
@@ -133,6 +131,9 @@ class Request(RequestBase, JSONMixin):
     The request object is a :class:`~werkzeug.wrappers.Request` subclass and
     provides all of the attributes Werkzeug defines plus a few Flask
     specific ones.
+
+
+    请求类
     """
 
     #: The internal URL rule that matched the request.  This can be
@@ -199,8 +200,6 @@ class Response(ResponseBase, JSONMixin):
     default.  Quite often you don't have to create this object yourself because
     :meth:`~flask.Flask.make_response` will take care of that for you.
 
-    响应类
-
     If you want to replace the response object used you can subclass this and
     set :attr:`~flask.Flask.response_class` to your subclass.
 
@@ -211,6 +210,9 @@ class Response(ResponseBase, JSONMixin):
     .. versionchanged:: 1.0
 
         Added :attr:`max_cookie_size`.
+
+
+    响应类
     """
 
     default_mimetype = 'text/html'
