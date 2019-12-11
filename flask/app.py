@@ -1971,6 +1971,7 @@ class Flask(_PackageBoundObject):
 
         status = headers = None
 
+        # 如果返回的是 tuple
         # unpack tuple returns
         if isinstance(rv, tuple):
             len_rv = len(rv)
@@ -1992,6 +1993,7 @@ class Flask(_PackageBoundObject):
                     ' (body, status), or (body, headers).'
                 )
 
+        # flask function view 不能返回 None
         # the body must not be None
         if rv is None:
             raise TypeError(
@@ -2000,8 +2002,10 @@ class Flask(_PackageBoundObject):
                 ' statement.'
             )
 
+        # 返回的不是 self.response_class
         # make sure the body is an instance of the response class
         if not isinstance(rv, self.response_class):
+            # 返回的是字符串等类型
             if isinstance(rv, (text_type, bytes, bytearray)):
                 # let the response class set the status and headers instead of
                 # waiting to do it manually, so that the class can handle any
@@ -2009,6 +2013,7 @@ class Flask(_PackageBoundObject):
                 rv = self.response_class(rv, status=status, headers=headers)
                 status = headers = None
             else:
+                # 其他类型
                 # evaluate a WSGI callable, or coerce a different response
                 # class to the correct type
                 try:
