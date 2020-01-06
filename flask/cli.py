@@ -441,10 +441,11 @@ class AppGroup(click.Group):
     changes the behavior of the :meth:`command` decorator so that it
     automatically wraps the functions in :func:`with_appcontext`.
 
+    Not to be confused with :class:`FlaskGroup`.
+
+
     这个类工作类似于 :class:`~click.Group` ， 但它改变了 :meth:`command`
     装饰器的行为，这样它能自动包装 :func:`with_appcontext` 。
-
-    Not to be confused with :class:`FlaskGroup`.
     """
 
     def command(self, *args, **kwargs):
