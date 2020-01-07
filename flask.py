@@ -112,6 +112,7 @@ def url_for(endpoint, **values):
     :param endpoint: the endpoint of the URL (name of the function)
     :param values: the variable arguments of the URL rule
     """
+    # 使用 werkzeug.routing.MapAdapter.build 构建 URL
     return _request_ctx_stack.top.url_adapter.build(endpoint, values)
 
 
